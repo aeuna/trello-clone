@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
-import { useRef } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import styled from "styled-components";
 import DraggabbleCard from "./DraggabbleCard";
 import { ITodo, toDoState } from "../atoms";
 import { useSetRecoilState } from "recoil";
+import { BsFillTrashFill } from "react-icons/bs";
 
 const Wrapper = styled.div`
   width: 300px;
@@ -14,6 +14,7 @@ const Wrapper = styled.div`
   min-height: 300px;
   display: flex;
   flex-direction: column;
+  // align-items: center;
 `;
 
 const Title = styled.h2`
@@ -47,6 +48,14 @@ const Form = styled.form`
   }
 `;
 
+const Trash = styled(BsFillTrashFill)`
+  color: gray;
+  float: right;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 interface IBoardProps {
   toDos: ITodo[];
   boardId: string;
@@ -58,20 +67,42 @@ interface IForm {
 
 function Board({ toDos, boardId }: IBoardProps) {
   const setToDos = useSetRecoilState(toDoState);
+
   const { register, setValue, handleSubmit } = useForm<IForm>();
+
   const onValid = ({ toDo }: IForm) => {
     const newToDo = {
       id: Date.now(),
       text: toDo,
     };
     setToDos((allBoards) => {
-      return { ...allBoards, [boardId]: [...allBoards[boardId], newToDo] };
+      const newToDoData = {
+        ...allBoards,
+        [boardId]: [...allBoards[boardId], newToDo],
+      };
+      window.localStorage.setItem("toDos", JSON.stringify(newToDoData));
+      return newToDoData;
     });
     setValue("toDo", "");
   };
+
+  const onClick = () => {
+    console.log("check");
+    setToDos((allBoards) => {
+      const copyBoard = { ...allBoards };
+      delete copyBoard[boardId];
+      console.log(copyBoard);
+      window.localStorage.setItem("toDos", JSON.stringify(copyBoard));
+      return copyBoard;
+    });
+  };
+
   return (
     <Wrapper>
-      <Title>{boardId}</Title>
+      <Title>
+        {boardId}
+        <Trash onClick={onClick} size={12} />
+      </Title>
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register("toDo", { required: true })}
@@ -93,6 +124,7 @@ function Board({ toDos, boardId }: IBoardProps) {
                 index={index}
                 toDoId={toDo.id}
                 toDoText={toDo.text}
+                boardId={boardId}
               />
             ))}
             {provided.placeholder}
