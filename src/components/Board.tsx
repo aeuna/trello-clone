@@ -4,7 +4,6 @@ import DraggabbleCard from "./DraggabbleCard";
 
 const Wrapper = styled.div`
   width: 300px;
-  padding: 20px 10px;
   padding-top: 10px;
   background-color: ${(props) => props.theme.boardColor};
   border-radius: 5px;
@@ -29,11 +28,12 @@ const Area = styled.div<IAreaProps>`
   flex-grow: 1;
   background-color: ${(props) =>
     props.isDraggingOver
-      ? "pink"
+      ? "#dfe6e9"
       : props.draggingFromThisWith
-      ? "red"
-      : "blue"};
+      ? "#b2bec3"
+      : "transparent"};
   transition: background-color 0.3s ease-in-out;
+  padding: 20px;
 `;
 
 interface IBoardProps {
